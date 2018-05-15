@@ -55,6 +55,7 @@ class Manager implements IProvider {
 								  string $name,
 								  int $type = IToken::TEMPORARY_TOKEN,
 								  int $remember = IToken::DO_NOT_REMEMBER): IToken {
+		//TODO switch to new token by default once it is there
 		return $this->defaultTokenProvider->generateToken(
 			$token,
 			$uid,
@@ -73,7 +74,11 @@ class Manager implements IProvider {
 	 * @throws InvalidTokenException
 	 */
 	public function updateToken(IToken $token) {
-		$this->defaultTokenProvider->updateToken($token);
+		if ($token instanceof DefaultToken) {
+			$this->defaultTokenProvider->updateToken($token);
+		}
+
+		throw new InvalidTokenException();
 	}
 
 	/**
@@ -83,7 +88,11 @@ class Manager implements IProvider {
 	 * @param IToken $token
 	 */
 	public function updateTokenActivity(IToken $token) {
-		$this->defaultTokenProvider->updateTokenActivity($token);
+		if ($token instanceof DefaultToken) {
+			$this->defaultTokenProvider->updateTokenActivity($token);
+		}
+
+		throw new InvalidTokenException();
 	}
 
 	/**
@@ -107,6 +116,7 @@ class Manager implements IProvider {
 	 * @return IToken
 	 */
 	public function getToken(string $tokenId): IToken {
+		// TODO: first try new token then old token
 		return $this->defaultTokenProvider->getToken($tokenId);
 	}
 
@@ -118,6 +128,7 @@ class Manager implements IProvider {
 	 * @return IToken
 	 */
 	public function getTokenById(int $tokenId): IToken {
+		// TODO: Find a way to distinguis between tokens
 		return $this->defaultTokenProvider->getTokenById($tokenId);
 	}
 
@@ -127,6 +138,8 @@ class Manager implements IProvider {
 	 * @throws InvalidTokenException
 	 */
 	public function renewSessionToken(string $oldSessionId, string $sessionId) {
+		// TODO: first try new then old
+		// TODO: if old move to new token type
 		$this->defaultTokenProvider->renewSessionToken($oldSessionId, $sessionId);
 	}
 
@@ -138,7 +151,10 @@ class Manager implements IProvider {
 	 * @return string
 	 */
 	public function getPassword(IToken $savedToken, string $tokenId): string {
-		return $this->defaultTokenProvider->getPassword($savedToken, $tokenId);
+		//TODO convert to new token type
+		if ($savedToken instanceof DefaultToken) {
+			return $this->defaultTokenProvider->getPassword($savedToken, $tokenId);
+		}
 	}
 
 	/**
@@ -150,7 +166,10 @@ class Manager implements IProvider {
 	 * @throws InvalidTokenException
 	 */
 	public function setPassword(IToken $token, string $tokenId, string $password) {
-		$this->defaultTokenProvider->setPassword($token, $tokenId, $password);
+		//TODO conver to new token
+		if ($token instanceof DefaultToken) {
+			$this->defaultTokenProvider->setPassword($token, $tokenId, $password);
+		}
 	}
 
 	/**
@@ -159,6 +178,7 @@ class Manager implements IProvider {
 	 * @param string $token
 	 */
 	public function invalidateToken(string $token) {
+		// TODO: check both providers
 		$this->defaultTokenProvider->invalidateToken($token);
 	}
 
@@ -169,6 +189,7 @@ class Manager implements IProvider {
 	 * @param int $id
 	 */
 	public function invalidateTokenById(IUser $user, int $id) {
+		//TODO find way to distinguis between tokens
 		$this->defaultTokenProvider->invalidateTokenById($user, $id);
 	}
 
@@ -176,6 +197,7 @@ class Manager implements IProvider {
 	 * Invalidate (delete) old session tokens
 	 */
 	public function invalidateOldTokens() {
+		//Call on both
 		$this->defaultTokenProvider->invalidateOldTokens();
 	}
 }
